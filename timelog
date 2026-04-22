@@ -1,0 +1,66 @@
+#!/bin/bash
+
+set -u
+
+readonly R=$'\033[0m' IDX=$'\033[38;5;3m' CLK=$'\033[38;5;7m' TXT=$'\033[38;5;6m'
+
+function usage {
+  printf 'usage: %s [--clock|-c | --lap|-l | --total|-t]\n' "$(basename "$0")" >&2
+}
+
+function fmt_delta_secs {
+  local d=$1 h m s
+  ((h=d/3600, m=d%3600/60, s=d%60))
+  printf '+%02d:%02d:%02d' "$h" "$m" "$s"
+}
+
+function fmt_row {
+  printf '%b' "${IDX}$(printf '%4d' "$1")${R}  ${CLK}$2${R} :: ${TXT}$3${R}"
+}
+
+function render {
+  printf '\033[2J\033[H> \n\n'
+  (($#)) && printf '%s\n' "$@"
+}
+
+function run {
+  local -a notes=()
+  local cnt=1 input mode=$1 last="" start="" now delta clk
+  while true; do
+    render "${notes[@]}"
+    printf '\033[1;3H\033[K'
+    read -r input || return
+    [[ -z "$input" ]] && continue
+    [[ $mode == clock ]] && clk=$(date +%H:%M:%S)
+    [[ $mode == lap ]] && {
+      now=$(date +%s)
+      [[ -z "$last" ]] && delta=0 || delta=$((now - last))
+      last=$now
+      clk=$(fmt_delta_secs "$delta")
+    }
+    [[ $mode == total ]] && {
+      now=$(date +%s)
+      [[ -z "$start" ]] && start=$now
+      delta=$((now - start))
+      clk=$(fmt_delta_secs "$delta")
+    }
+    notes+=("$(fmt_row "$cnt" "$clk" "$input")")
+    ((++cnt))
+  done
+}
+
+MODE=clock
+case $# in
+  0) ;;
+  1)
+    case $1 in
+      --clock|-c) ;;
+      --lap|-l) MODE=lap ;;
+      --total|-t) MODE=total ;;
+      *) usage; exit 1 ;;
+    esac
+    ;;
+  *) usage; exit 1 ;;
+esac
+
+run "$MODE"
