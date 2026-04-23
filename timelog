@@ -3,6 +3,7 @@
 set -u
 
 readonly R=$'\033[0m' IDX=$'\033[38;5;3m' CLK=$'\033[38;5;7m' TXT=$'\033[38;5;6m'
+readonly HELP=' Ctrl+S save | Ctrl+C exit'
 
 function usage {
   printf 'usage: %s [--clock|-c | --lap|-l | --total|-t]\n' "$(basename "$0")" >&2
@@ -18,18 +19,73 @@ function fmt_row {
   printf '%b' "${IDX}$(printf '%4d' "$1")${R}  ${CLK}$2${R} :: ${TXT}$3${R}"
 }
 
+function fmt_row_plain {
+  printf '%4d  %s :: %s' "$1" "$2" "$3"
+}
+
+function save_rows {
+  local -n src=$1
+  local file="./$(date +%s).log"
+  ((${#src[@]})) || { printf 'nothing to save'; return 1; }
+  printf '%s\n' "${src[@]}" > "$file" || { printf 'save failed: %s' "$file"; return 1; }
+  printf 'saved: %s' "$file"
+}
+
+function read_line_or_hotkey {
+  local key line=""
+  while IFS= read -rsn1 key; do
+    [[ -z $key ]] && { REPLY=$line; CTRL=""; return 0; }
+    case $key in
+      $'\x13') REPLY=$line; CTRL=s; return 0 ;;
+      $'\n'|$'\r') REPLY=$line; CTRL=""; return 0 ;;
+      $'\x7f')
+        [[ -z $line ]] && continue
+        line=${line%?}
+        printf '\033[3;3H\033[K%s' "$line"
+        continue
+        ;;
+    esac
+    [[ $key == [[:cntrl:]] ]] && continue
+    line+=$key
+    printf '%s' "$key"
+  done
+  return 1
+}
+
 function render {
-  printf '\033[2J\033[H> \n\n'
+  local status=$1
+  shift
+  printf '\033[2J\033[H%s\n\n> \n\n' "$HELP"
   (($#)) && printf '%s\n' "$@"
+  printf '\n%s\n' "$status"
+}
+
+function enable_hotkeys {
+  [[ -t 0 ]] || return
+  TTY_STATE=$(stty -g)
+  stty -ixon
+}
+
+function restore_tty {
+  [[ -t 0 ]] || return
+  [[ -z ${TTY_STATE:-} ]] && return
+  stty "$TTY_STATE"
 }
 
 function run {
-  local -a notes=()
-  local cnt=1 input mode=$1 last="" start="" now delta clk
+  local -a notes=() rows=()
+  local cnt=1 input mode=$1 last="" start="" now delta clk status=""
   while true; do
-    render "${notes[@]}"
-    printf '\033[1;3H\033[K'
-    read -r input || return
+    render "$status" "${notes[@]}"
+    printf '\033[3;3H\033[K'
+    if [[ -t 0 ]]; then
+      CTRL=""
+      read_line_or_hotkey || return
+      input=$REPLY
+      [[ $CTRL == s ]] && { status=$(save_rows rows); continue; }
+    else
+      read -r input || return
+    fi
     [[ -z "$input" ]] && continue
     [[ $mode == clock ]] && clk=$(date +%H:%M:%S)
     [[ $mode == lap ]] && {
@@ -44,7 +100,9 @@ function run {
       delta=$((now - start))
       clk=$(fmt_delta_secs "$delta")
     }
+    rows+=("$(fmt_row_plain "$cnt" "$clk" "$input")")
     notes+=("$(fmt_row "$cnt" "$clk" "$input")")
+    status=""
     ((++cnt))
   done
 }
@@ -63,4 +121,8 @@ case $# in
   *) usage; exit 1 ;;
 esac
 
+enable_hotkeys
+trap restore_tty EXIT
+trap 'restore_tty; exit 130' INT
+trap 'restore_tty; exit 143' TERM
 run "$MODE"
