@@ -24,10 +24,10 @@ Type "./timelog" Sleep 1s Enter
 Sleep 1s
 Type "Standup: align priorities" Sleep 1s Enter
 
-Sleep 1.5s
+Sleep 1s
 Type "Fix flaky parser test" Sleep 1s Enter
 
-Sleep 2s
+Sleep 1s
 Type "Write polished VHS demos" Sleep 1s Enter
 
 Sleep 1.5s

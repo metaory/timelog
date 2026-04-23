@@ -24,10 +24,10 @@ Type "./timelog --clock" Sleep 1s Enter
 Sleep 1s
 Type "Start sprint planning notes" Sleep 1s Enter
 
-Sleep 2s
+Sleep 1s
 Type "Pair on release checklist" Sleep 1s Enter
 
-Sleep 2s
+Sleep 1s
 Type "Draft changelog bullets" Sleep 1s Enter
 
 Sleep 1.5s

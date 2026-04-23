@@ -24,10 +24,10 @@ Type "./timelog --total" Sleep 1s Enter
 Sleep 1s
 Type "Start deep work block" Sleep 1s Enter
 
-Sleep 2s
+Sleep 1s
 Type "Prototype tape cleanup changes" Sleep 1s Enter
 
-Sleep 4s
+Sleep 1s
 Type "Verify output and commit notes" Sleep 1s Enter
 
 Sleep 1.5s

@@ -24,10 +24,10 @@ Type "./timelog --lap" Sleep 1s Enter
 Sleep 1s
 Type "Open editor and prep context" Sleep 1s Enter
 
-Sleep 3s
+Sleep 1s
 Type "Implement save status polish" Sleep 1s Enter
 
-Sleep 5s
+Sleep 1s
 Type "Review and write docs note" Sleep 1s Enter
 
 Sleep 1.5s
