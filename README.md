@@ -14,13 +14,13 @@ Interactive mode (TTY) reads keys directly, supports **Ctrl+S** to save entries 
 
 <div align="center">
   <p><strong>Clock (--clock)</strong></p>
-  <img src=".github/demos/clock.gif" alt="timelog clock mode demo" width="60%" />
-
+  <img src=".github/demos/clock.gif" alt="timelog clock mode demo" width="80%" />
+  <hr>
   <p><strong>Lap (--lap)</strong></p>
-  <img src=".github/demos/lap.gif" alt="timelog lap mode demo" width="60%" />
-
+  <img src=".github/demos/lap.gif" alt="timelog lap mode demo" width="80%" />
+  <hr>
   <p><strong>Total (--total)</strong></p>
-  <img src=".github/demos/total.gif" alt="timelog total mode demo" width="60%" />
+  <img src=".github/demos/total.gif" alt="timelog total mode demo" width="80%" />
 </div>
 
 ## Usage
