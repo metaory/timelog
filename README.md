@@ -33,6 +33,32 @@ bash timelog --total    # elapsed since first line (+HH:MM:SS), first line +00:0
 # shorts: -c (clock), -l (lap), -t (total)
 ```
 
+### Modes
+
+- `clock`: records the current wall-clock time for each entry.
+- `lap`: records the time passed since the previous entry.
+- `total`: records total elapsed time since the first entry.
+
+Examples:
+
+`clock` (wall time on each line)
+
+- `1  09:00:02 :: Open project` - real clock when you wrote entry 1.
+- `2  09:02:18 :: Run tests` - later clock time for entry 2.
+- `3  09:05:41 :: Commit fix` - current clock time again for entry 3.
+
+`lap` (time since previous line)
+
+- `1  +00:00:00 :: Open project` - first entry always starts at zero.
+- `2  +00:02:16 :: Run tests` - took 2m16s after previous entry.
+- `3  +00:03:23 :: Commit fix` - took 3m23s since entry 2.
+
+`total` (time since first line)
+
+- `1  +00:00:00 :: Open project` - first entry starts elapsed timer.
+- `2  +00:02:16 :: Run tests` - total elapsed since entry 1.
+- `3  +00:05:39 :: Commit fix` - cumulative elapsed from the start.
+
 Type a line and press **Enter**. Each entry is recorded as `index  time  ::  text` and the screen refreshes. Empty lines are skipped. **Ctrl+S** saves committed entries to a new epoch-named `.log` in the current directory (status appears below the list). Exit with **Ctrl+C** or **Ctrl+D** (EOF).
 
 To run it directly:

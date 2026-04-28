@@ -2,7 +2,7 @@
 
 set -u
 
-readonly R=$'\033[0m' IDX=$'\033[38;5;3m' CLK=$'\033[38;5;7m' TXT=$'\033[38;5;6m'
+readonly R=$'\033[0m' IDX=$'\033[38;5;3m' CLK=$'\033[38;5;7m' TXT=$'\033[38;5;6m' MODEC=$'\033[38;5;6m'
 readonly HELP=' Ctrl+S save | Ctrl+C exit'
 
 function usage {
@@ -53,9 +53,9 @@ function read_line_or_hotkey {
 }
 
 function render {
-  local status=$1
-  shift
-  printf '\033[2J\033[H%s\n\n> \n\n' "$HELP"
+  local mode=$1 status=$2
+  shift 2
+  printf '\033[2J\033[H%b %s MODE%b |%s\n\n> \n\n' "$MODEC" "${mode^^}" "$R" "$HELP"
   (($#)) && printf '%s\n' "$@"
   printf '\n%s\n' "$status"
 }
@@ -76,7 +76,7 @@ function run {
   local -a notes=() rows=()
   local cnt=1 input mode=$1 last="" start="" now delta clk status=""
   while true; do
-    render "$status" "${notes[@]}"
+    render "$mode" "$status" "${notes[@]}"
     printf '\033[3;3H\033[K'
     if [[ -t 0 ]]; then
       CTRL=""
